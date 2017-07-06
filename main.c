@@ -7,7 +7,7 @@
 #define N_ENTRADAS 31
 #define N_EPOCAS 2
 
-#define FLAG_ALEATORIO 1
+#define FLAG_ALEATORIO 0
 
 typedef struct neuro
 {
@@ -47,6 +47,7 @@ void imprimePesos(Neuronio *n)
 {
     printf("\nPESOS:\n");
     int i;
+    printf("%f\n",n->peso[0]);
     for(i=1;i<N_ENTRADAS;i++)
     {
         printf("%f\t",n->peso[i]);
@@ -60,6 +61,7 @@ void imprimeEntradas(Entrada *entradas,int totalEntradas)
     printf("\nENTRADAS:\n");
     for(i=0;i<totalEntradas;i++)
     {
+        printf("%d\n",entradas->valores[0]);
         for(j=1;j<N_ENTRADAS;j++)
         {
             printf("%d",entradas[i].valores[j]);
@@ -112,7 +114,7 @@ int calculaNeuronio(Neuronio * neuro, int *entrada)
     int i;
     float resultado = 0;
 
-    for(i=1;i<N_ENTRADAS;i++)
+    for(i=0;i<N_ENTRADAS;i++)
     {
         resultado += neuro->peso[i] * entrada[i];
     }
@@ -130,7 +132,7 @@ void calculaPeso(Neuronio * neuro, int *entrada,float e)
     int i;
 
     neuro->entrada = e;
-    for(i=1;i<N_ENTRADAS;i++)
+    for(i=0;i<N_ENTRADAS;i++)
     {
         neuro->peso[i] += neuro->entrada * 1 * entrada[i];
         //printf("\nNovo Peso: %f",neuro->peso[i]);
