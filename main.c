@@ -127,7 +127,7 @@ int calculaNeuronio(Neuronio * neuro, int *entrada)
     else return 0;
 }
 
-void calculaPeso(Neuronio * neuro, int *entrada,float e)
+void calculaPeso(Neuronio *neuro, int *entrada,float e)
 {
     int i;
 
@@ -135,68 +135,99 @@ void calculaPeso(Neuronio * neuro, int *entrada,float e)
     for(i=0;i<N_ENTRADAS;i++)
     {
         neuro->peso[i] += neuro->entrada * 1 * entrada[i];
-        //printf("\nNovo Peso: %f",neuro->peso[i]);
+        //printf("\nNovo Peso1: %f",neuro->peso[i]);
     }
 }
-
-
 
 int main()
 {
     srand(time(NULL));
-
+    int i,j;
     //inicia neuronio
-    Neuronio *n = (Neuronio*)malloc(sizeof(Neuronio));
-    iniciaPesos(n,FLAG_ALEATORIO);
+    //Neuronio **n = (Neuronio**)malloc(sizeof(Neuronio*)*2);
+    //n[0] = (Neuronio*)malloc(sizeof(Neuronio));
+    //n[1] = (Neuronio*)malloc(sizeof(Neuronio));
+    Neuronio n[2];
+    iniciaPesos(&n[0],FLAG_ALEATORIO);
+    iniciaPesos(&n[1],FLAG_ALEATORIO);
 
     Entrada **entradas = (Entrada**) malloc(sizeof(Entrada*)*6);
     entradas[0] = leArquivo("0.txt",10);
     entradas[1] = leArquivo("1.txt",10);
-    entradas[2] = leArquivo("2.txt",1);
-    entradas[3] = leArquivo("3.txt",1);
-    entradas[4] = leArquivo("4.txt",1);
-    entradas[5] = leArquivo("5.txt",1);
+    entradas[2] = leArquivo("2.txt",10);
+    entradas[3] = leArquivo("3.txt",10);
+    entradas[4] = leArquivo("4.txt",10);
+    entradas[5] = leArquivo("5.txt",10);
     //Entrada *entradasZero = leArquivo("0.txt",10);
     //Entrada *entradasUm = leArquivo("1.txt",10);
     //imprimeEntradas(entradas[0],10);
+    imprimePesos(&n[0]);
+    imprimePesos(&n[1]);
 
+
+    int desejado[2][2] =
+    {
+        {1,0}, //primeiro neuronio, treina para 0
+        {0,1} //segundo neuronio, treina para 1
+    };
     //inicia treinamento
-    int flag0 = 0, flag1 = 0;
+    int flag0=0,flag1=0;
+    int flag[2] = {0,0};
     int epoch =0;
-    while(!flag0 || !flag1)
+    int acertos = 0;
+
+    while(acertos < 2)
     {
         printf("\nEPOCA: %d",epoch);
-        //treina 0:
-        flag0 = 0;
-        flag1 = 0;
-        int flag;
-        flag = calculaNeuronio(n,entradas[0][0].valores);
-        calculaPeso(n,entradas[0][0].valores,(0-flag)); //desejado - obtido
-        if(flag == 0) flag0 = 1;
+        acertos = 0;
+        for(i=0;i<2;i++)
+        {
+            for(j=0;j<2;j++)
+            {
+                flag[j] = calculaNeuronio(&n[j],entradas[i][0].valores);
+                calculaPeso(&n[j],entradas[i][0].valores,(desejado[i][j]-flag[j])); //desejado - obtido
+            }
+            //printf("\nNovo Peso: %f",n[1].peso[i]);
+            //printf("\n %d || %d \n",flag[0],flag[1]);
 
-        //treina 1:
-        flag = calculaNeuronio(n,entradas[1][0].valores);
-        calculaPeso(n,entradas[1][0].valores,(1-flag));
-        if(flag == 1) flag1= 1;
+            if(flag[0] == desejado[i][0] && flag[1] == desejado[i][1]) //verifica se a regra está ok
+                acertos++;
+        }
+        //imprimePesos(&n[0]);
+    //imprimePesos(&n[1]);
+        //printf("\n\n0:%f\n",n[0].peso[0]);
+
+        //getchar();
         epoch++;
     }
-    imprimePesos(n);
+
+    imprimePesos(&n[0]);
+    imprimePesos(&n[1]);
 
     //Testa 0s
-    int i;
     for(i=0;i<10;i++)
     {
-        printf("TESTE0:%d\n",calculaNeuronio(n,entradas[0][i].valores));
+        printf("TESTE0:%d",calculaNeuronio(&n[0],entradas[0][i].valores));
+        printf(" %d\n",calculaNeuronio(&n[1],entradas[0][i].valores));
     }
     //Testa 1s
     for(i=0;i<10;i++)
     {
-        printf("TESTE1:%d\n",calculaNeuronio(n,entradas[1][i].valores));
+        printf("TESTE1:%d",calculaNeuronio(&n[0],entradas[1][i].valores));
+        printf(" %d\n",calculaNeuronio(&n[1],entradas[1][i].valores));
     }
-    printf("TESTE2:%d\n",calculaNeuronio(n,entradas[2][0].valores));
-    printf("TESTE3:%d\n",calculaNeuronio(n,entradas[3][0].valores));
-    printf("TESTE4:%d\n",calculaNeuronio(n,entradas[4][0].valores));
-    printf("TESTE5:%d\n",calculaNeuronio(n,entradas[5][0].valores));
+
+    printf("TESTE2:%d",calculaNeuronio(&n[0],entradas[2][0].valores));
+    printf(" %d\n",calculaNeuronio(&n[1],entradas[2][0].valores));
+
+    printf("TESTE3:%d",calculaNeuronio(&n[0],entradas[3][0].valores));
+    printf(" %d\n",calculaNeuronio(&n[1],entradas[3][0].valores));
+
+    printf("TESTE4:%d",calculaNeuronio(&n[0],entradas[4][0].valores));
+    printf(" %d\n",calculaNeuronio(&n[1],entradas[4][0].valores));
+
+    printf("TESTE5:%d",calculaNeuronio(&n[0],entradas[5][0].valores));
+    printf(" %d\n",calculaNeuronio(&n[1],entradas[5][0].valores));
     //Testa demais
 
 
